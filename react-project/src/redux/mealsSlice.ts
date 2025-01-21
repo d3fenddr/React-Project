@@ -1,7 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Meal } from "../types";
 
-const initialState: { items: Meal[]; index: number } = {
+interface MealsState {
+  items: Meal[];
+  index: number;
+}
+
+const initialState: MealsState = {
   items: [],
   index: 0,
 };
@@ -10,18 +15,26 @@ const mealsSlice = createSlice({
   name: "meals",
   initialState,
   reducers: {
-    addMeal(state, action: PayloadAction<Meal>) {
-      state.items.push(action.payload);
+    incrementIndex(state) {
+      state.index = (state.index + 1) % state.items.length;
     },
-    deleteMeal(state, action: PayloadAction<number>) {
-      state.items = state.items.filter((meal) => meal.id !== action.payload);
+
+    decrementIndex(state) {
+      state.index =
+        (state.index - 1 + state.items.length) % state.items.length;
     },
+
     setIndex(state, action: PayloadAction<number>) {
-      state.index = action.payload;
+      if (action.payload >= 0 && action.payload < state.items.length) {
+        state.index = action.payload;
+      } else {
+        console.warn("Invalid index value:", action.payload);
+      }
     },
   },
 });
 
-export const { addMeal, deleteMeal, setIndex } = mealsSlice.actions;
+export const { incrementIndex, decrementIndex, setIndex } =
+  mealsSlice.actions;
 
 export default mealsSlice.reducer;
